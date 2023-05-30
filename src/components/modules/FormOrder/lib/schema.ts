@@ -1,15 +1,23 @@
 import { KeyToUnion } from 'src/type'
 import * as z from 'zod'
 
+const notNull = 'Поле не повинно бути порожнім'
+
 const nonSpecialChars = (field: string) => {
-  const message = `Поле ${field} не повинно містити числа або спеціальні символи`
-  return z.string().regex(/^[^0-9!@#$%^&*()_+\-=[\]{};:"\\|,.<>/?]+$/, { message })
+  return z
+    .string()
+    .refine((value) => value !== '', {
+      message: notNull,
+    })
+    .refine((value) => /^[^0-9!@#$%^&*()_+\-=[\]{};:"\\|,.<>/?]+$/.test(value), {
+      message: `Поле ${field} не повинно містити числа або спеціальні символи`,
+    })
 }
 
 export const schema = z
   .object({
     service: z.enum(['Редагування', 'Переклад']),
-    email: z.string().email(),
+    email: z.string().email({ message: 'Некоректний email' }),
     name: nonSpecialChars("з ім'ям"),
     language: z.enum(['Українська', 'Російська', 'Англійська']),
     text: z.string().optional(),

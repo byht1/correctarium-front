@@ -1,4 +1,10 @@
 html {
-  --background: #ffffff;
+  --background: darkcyan;
   --black-text: #000000;
+
+  --e-focus-border-color: border-color 250ms linear;
+  --e-focus-color: color 250ms linear;
+  --e-hover-background: background-color 250ms linear;
+  --e-opacity: opacity 250ms linear;
+  --e-transform: transform 250ms linear;
 }

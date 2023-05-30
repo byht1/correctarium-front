@@ -12,6 +12,8 @@ body {
   font-style: normal;
   font-size: 14px;
   line-height: 1.57;
+
+  background-color: var(--background);
 }
 
 a {

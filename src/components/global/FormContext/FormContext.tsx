@@ -18,7 +18,7 @@ export const FormContext: FC<PropsFormContext> = ({
 
   return (
     <FormProvider {...methods}>
-      <form autoComplete={autoComplete} onSubmit={handleSubmit(submit)}>
+      <form autoComplete={autoComplete} onSubmit={handleSubmit(submit)} noValidate>
         {children}
       </form>
     </FormProvider>
