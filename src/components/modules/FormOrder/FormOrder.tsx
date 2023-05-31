@@ -4,7 +4,7 @@ import { Box, FormContext } from 'src/components/global'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TOrderForm, schema } from './lib/schema'
-import { Input, Selector } from '../elementForm'
+import { Input, Selector, TextareaAndFile } from '../elementForm'
 
 // IoIosArrowUp
 // IoIosArrowDown
@@ -12,18 +12,18 @@ import { Input, Selector } from '../elementForm'
 export const FormOrder = () => {
   const methods = useForm<TOrderForm>({ resolver: zodResolver(schema) })
 
-  const handlerSubmit = (data: any) => {
+  const handlerSubmit = (data: TOrderForm) => {
     console.log('🚀  data:', data)
   }
 
   return (
     <Container>
       <Title>Замовити переклад або редагування</Title>
-      <h2>Замовити переклад або редагування</h2>
 
       <FormContext submit={handlerSubmit} methods={methods} autoComplete="off">
         <Box display="flex" flexDirection="column" gridGap="15px">
           <Selector inputName="service" name="Послуга" value={['Редагування', 'Переклад']} />
+          <TextareaAndFile />
           <Input inputName="email" type="email" name="Ваша електронна пошта" />
           <Input inputName="name" type="text" name="Ваше ім'я" />
           <Input inputName="comment" type="text" name="Коментар або покликання" />
@@ -38,3 +38,5 @@ export const FormOrder = () => {
     </Container>
   )
 }
+
+// TextareaAndFile

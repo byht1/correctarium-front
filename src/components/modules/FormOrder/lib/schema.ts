@@ -21,7 +21,7 @@ export const schema = z
     name: nonSpecialChars("з ім'ям"),
     language: z.enum(['Українська', 'Російська', 'Англійська']),
     text: z.string().optional(),
-    file: z.string().optional(),
+    file: z.unknown().optional(),
     comment: z.string().optional(),
   })
   .refine((data) => data.text || data.file, {
