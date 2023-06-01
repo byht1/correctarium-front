@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 export const Label = styled.label`
   position: relative;
-  width: 345px;
+  width: var(--width-input);
 
   display: flex;
   flex-direction: column;
@@ -57,6 +57,8 @@ export const Text = styled.span`
 `
 
 export const ErrorText = styled.span`
+  display: block;
+  margin-top: 5px;
   max-width: 100%;
 
   color: red;

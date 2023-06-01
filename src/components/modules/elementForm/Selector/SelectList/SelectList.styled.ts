@@ -23,6 +23,8 @@ export const Element = styled.li<PropElement>`
   background-color: ${({ $isCurrent }) => ($isCurrent ? '#eeeeee' : 'var(--background)')};
   transition: var(--e-hover-background);
 
+  cursor: pointer;
+
   &:hover {
     background-color: #eeeeee;
   }

@@ -3,11 +3,15 @@ import { DownloadText, FileWrapper, Textarea, UserContentsWrapper } from './Text
 import { useFormContext } from 'react-hook-form'
 import { TOrderForm } from '../../FormOrder/lib/schema'
 import { PreviewFile } from './PreviewFile/PreviewFile'
+import { ErrorText } from '../ElementForm.styled'
 
 export const TextareaAndFile = () => {
   const [length, setLength] = useState(0)
-  console.log('🚀  length:', length)
-  const { watch, register } = useFormContext<TOrderForm>()
+  const {
+    watch,
+    register,
+    formState: { errors },
+  } = useFormContext<TOrderForm>()
   const file = watch('file') as FileList | undefined
   const text = watch('text')
 
@@ -24,8 +28,8 @@ export const TextareaAndFile = () => {
   }, [file])
 
   useEffect(() => {
-    if (!text) return
-    setLength(text.split('\n').join('').trim().length)
+    if (!text) return setLength(0)
+    setLength(text.trim().length)
   }, [text])
 
   return (
@@ -44,6 +48,7 @@ export const TextareaAndFile = () => {
       {!!file?.length && !!length && (
         <PreviewFile setLength={setLength} file={file[0]} length={length} />
       )}
+      {errors.text?.message && <ErrorText>{errors.text?.message}</ErrorText>}
     </UserContentsWrapper>
   )
 }

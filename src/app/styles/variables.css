@@ -1,10 +1,13 @@
 html {
   --background: darkcyan;
-  --black-text: #000000;
+  --black-text: #1b2235;
+
+  --width-input: 345px;
 
   --e-focus-border-color: border-color 250ms linear;
   --e-focus-color: color 250ms linear;
   --e-hover-background: background-color 250ms linear;
   --e-opacity: opacity 250ms linear;
+  --e-box-shadow: box-shadow 250ms linear;
   --e-transform: transform 250ms linear;
 }

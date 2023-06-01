@@ -8,9 +8,16 @@ type ListProps = {
 
   setValue: (value: ValuesSelect) => void
   setShow: Dispatch<SetStateAction<boolean>>
+  clickOutside: (e: MouseEvent) => void
 }
 
-export const SelectList: FC<ListProps> = ({ setShow, setValue, value, currentValue }) => {
+export const SelectList: FC<ListProps> = ({
+  setShow,
+  setValue,
+  clickOutside,
+  value,
+  currentValue,
+}) => {
   const [currentFocusValue, setCurrentFocusValue] = useState(value.indexOf(currentValue))
 
   useEffect(() => {
@@ -48,12 +55,18 @@ export const SelectList: FC<ListProps> = ({ setShow, setValue, value, currentVal
       }
     }
 
+    const handleBlur = (e: MouseEvent) => {
+      clickOutside(e)
+    }
+
     document.addEventListener('keydown', typeEvents)
+    document.addEventListener('click', handleBlur)
 
     return () => {
       document.removeEventListener('keydown', typeEvents)
+      document.removeEventListener('click', handleBlur)
     }
-  }, [currentFocusValue, setShow, setValue, value])
+  }, [clickOutside, currentFocusValue, setShow, setValue, value])
 
   return (
     <List>

@@ -7,6 +7,7 @@ export const UserContentsWrapper = styled.div`
   min-height: 200px;
 
   display: flex;
+  flex-direction: column;
 
   ${device.tablet} {
     & {
@@ -19,6 +20,7 @@ export const Textarea = styled.textarea`
   outline: none;
 
   width: 100%;
+  min-width: var(--width-input);
   min-height: 200px;
   padding: 20px 30px;
   overflow: auto;
@@ -49,6 +51,7 @@ export const FileWrapper = styled.div`
   line-height: 1.57;
   letter-spacing: -0.05px;
 `
+
 export const DownloadText = styled.span`
   cursor: pointer;
   color: #0068e4;

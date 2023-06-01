@@ -1,6 +1,7 @@
-import { FormOrder } from 'src/components/modules/FormOrder'
 import './styles/global.css'
 import './styles/variables.css'
+import { FormOrder } from 'src/components/modules/FormOrder'
+import { Footer } from 'src/components/modules/Footer'
 
 function App() {
   return (
@@ -8,7 +9,7 @@ function App() {
       <main>
         <FormOrder />
       </main>
-      <footer></footer>
+      <Footer />
     </>
   )
 }

@@ -16,16 +16,21 @@ const nonSpecialChars = (field: string) => {
 
 export const schema = z
   .object({
-    service: z.enum(['Редагування', 'Переклад']),
+    service: z.enum(['Редагування', 'Переклад'], {
+      errorMap: () => ({ message: notNull }),
+    }),
     email: z.string().email({ message: 'Некоректний email' }),
     name: nonSpecialChars("з ім'ям"),
-    language: z.enum(['Українська', 'Російська', 'Англійська']),
+    language: z.enum(['Українська', 'Російська', 'Англійська'], {
+      errorMap: () => ({ message: notNull }),
+    }),
     text: z.string().optional(),
-    file: z.unknown().optional(),
+    file: z.any().optional(),
     comment: z.string().optional(),
   })
-  .refine((data) => data.text || data.file, {
+  .refine((data) => data.text || data.file.length > 0, {
     message: 'Необхідно вказати «текст» або завантажити «файл».',
+    path: ['text'],
   })
 
 export type TOrderForm = z.TypeOf<typeof schema>

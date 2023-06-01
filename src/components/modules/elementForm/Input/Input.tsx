@@ -27,8 +27,8 @@ export const Input: FC<InputProps> = ({
     <Label>
       <CustomInput type={type} {...register(inputName)} placeholder={name} disabled={disabled} />
       {afterElement && <AfterBox>{afterElement}</AfterBox>}
-      <Text>{name}</Text>
       {errors[inputName]?.message && <ErrorText>{errors[inputName]?.message}</ErrorText>}
+      <Text>{name}</Text>
     </Label>
   )
 }
