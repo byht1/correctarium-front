@@ -74,7 +74,10 @@ export const SelectList: FC<ListProps> = ({
         <Element
           key={el}
           $isCurrent={currentValue === el || currentFocusValue === i}
-          onClick={() => setValue(el)}
+          onClick={() => {
+            console.log('🚀  el:', el)
+            setValue(el)
+          }}
         >
           <span>{el}</span>
         </Element>

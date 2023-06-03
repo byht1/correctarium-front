@@ -1,6 +1,5 @@
 import { OrderCalculationData } from './OrderCalculationData'
 import moment from 'moment'
-import 'moment/locale/uk'
 import {
   FormatMSToHoursAndMinutesFn,
   IOrderCalcService,
@@ -12,9 +11,9 @@ import {
   TGetOrderDataFn,
   TOrder,
   TOrderCalcServiceData,
+  TReadFileFn,
 } from './type'
-
-moment.locale('uk')
+import { MonthKey, months } from 'src/helpers'
 
 export class OrderCalcService extends OrderCalculationData implements IOrderCalcService {
   private orderData: TOrder
@@ -35,6 +34,18 @@ export class OrderCalcService extends OrderCalculationData implements IOrderCalc
       deadline: totalWorkingTime,
       deadlineDate: deadlineDate,
     }
+  }
+
+  public static readFile: TReadFileFn = async (file) => {
+    if (!file) return 0
+    return new Promise<number>((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const content = event.target?.result as string
+        resolve(content.length)
+      }
+      reader.readAsText(file)
+    })
   }
 
   public getOrderData: TGetOrderDataFn = () => this.orderData
@@ -72,45 +83,75 @@ export class OrderCalcService extends OrderCalculationData implements IOrderCalc
     return `${day * WORKING_HOURS + hour} годин ${minutes} хвилин`
   }
 
-  private calculateCompletionDateAndTime: TCalculateCompletionDateAndTimeFn = (workDuration) => {
+  private calculateCompletionDateAndTime: TCalculateCompletionDateAndTimeFn = (workTimeMs) => {
     const {
       WORKING_HOURS,
       START_TIME_HOURS,
       START_TIME_MINUTES,
       FINISH_TIME_HOURS,
       FINISH_TIME_MINUTES,
+      HOUR_MS,
     } = this
 
-    const today = moment()
-    let deadline = today
-      .clone()
-      .startOf('day')
-      .add(START_TIME_HOURS, 'hours')
-      .add(START_TIME_MINUTES, 'minutes')
+    const startOfWorkday = moment().set({
+      hour: START_TIME_HOURS,
+      minute: START_TIME_MINUTES,
+      second: 0,
+      millisecond: 0,
+    })
+    const endOfWorkday = moment().set({
+      hour: FINISH_TIME_HOURS,
+      minute: FINISH_TIME_MINUTES,
+      second: 0,
+      millisecond: 0,
+    })
 
-    // Якщо замовлення отримане після закінчення робочого дня, почати виконання наступного робочого дня
-    if (today.isAfter(deadline.clone().add(WORKING_HOURS, 'hours'))) {
-      deadline.add(1, 'days')
+    // Чи розміщено замовлення у вихідний день?
+    if (moment().isoWeekday() === 6) {
+      startOfWorkday.add(2, 'days')
+      endOfWorkday.add(2, 'days')
+    } else if (moment().isoWeekday() === 7) {
+      startOfWorkday.add(1, 'day')
+      endOfWorkday.add(1, 'day')
     }
 
-    // Додати час на виконання роботи
-    deadline.add(workDuration, 'milliseconds')
+    // Розрахунок робочого часу, що залишився, з урахуванням вихідних
+    const remainingWorkTimeMs = workTimeMs % (WORKING_HOURS * HOUR_MS)
+    const additionalDays = Math.floor(workTimeMs / (WORKING_HOURS * HOUR_MS))
 
-    // Перевірити, чи потрібно збільшити дедлайн через вихідні дні
-    while (deadline.isoWeekday() === 6 || deadline.isoWeekday() === 7) {
-      deadline.add(1, 'days')
+    // Додаю додаткові робочі дні на основі часу, що залишився
+    let currentWorkTimeMs = remainingWorkTimeMs
+    const currentDeadline = moment(startOfWorkday)
+    while (currentWorkTimeMs > 0) {
+      const isAfterWorkday = currentDeadline.isAfter(endOfWorkday)
+      const isSaturday = currentDeadline.isoWeekday() === 6
+      const isSunday = currentDeadline.isoWeekday() === 7
+
+      if (isAfterWorkday || isSaturday || isSunday) {
+        currentDeadline.add(1, 'day')
+        continue
+      }
+
+      const remainingWorkdayTime = endOfWorkday.diff(currentDeadline)
+      const allocatedWorkTimeMs = Math.min(currentWorkTimeMs, remainingWorkdayTime)
+
+      currentDeadline.add(allocatedWorkTimeMs, 'milliseconds')
+      currentWorkTimeMs -= allocatedWorkTimeMs
     }
 
-    // Врахувати час закінчення робочого дня
-    if (deadline.isAfter(deadline.clone().startOf('day').add(FINISH_TIME_HOURS, 'hours'))) {
-      deadline = deadline
-        .clone()
-        .startOf('day')
-        .add(FINISH_TIME_HOURS, 'hours')
-        .add(FINISH_TIME_MINUTES, 'minutes')
+    // Додаю додаткові робочі дні залежно від кількості додаткових днів
+    currentDeadline.add(additionalDays, 'days')
+
+    // Коригую термін, якщо він припадає на вихідні
+    if (currentDeadline.isoWeekday() === 6) {
+      currentDeadline.add(2, 'days')
+    } else if (currentDeadline.isoWeekday() === 7) {
+      currentDeadline.add(1, 'day')
     }
-    moment.locale('uk')
-    return deadline.format('D MMMM, HH:mm')
+
+    // return currentDeadline.format('dddd HH:mm')
+    const [day, month, time] = currentDeadline.format('D MMMM HH:mm').split(' ')
+    return `${day} ${months[month as MonthKey]}, ${time}`
   }
 
   private getExpansion: TGetExpansionFn = (file) => {

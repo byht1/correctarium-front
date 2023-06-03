@@ -12,6 +12,7 @@ export type TOrder = {
 }
 
 export type TGetOrderDataFn = () => TOrder
+export type TReadFileFn = (file: File | undefined) => Promise<number>
 
 export type TCalculatePriceFn = (...args: DataCalcArguments) => number
 export type TCalculateExecutionTimeMs = (...args: DataCalcArguments) => number

@@ -4,6 +4,7 @@ import { useFormContext } from 'react-hook-form'
 import { TOrderForm } from '../../FormOrder/lib/schema'
 import { PreviewFile } from './PreviewFile/PreviewFile'
 import { ErrorText } from '../ElementForm.styled'
+import { OrderCalcService } from 'src/service/orderCalc/orderCalc.service'
 
 export const TextareaAndFile = () => {
   const [length, setLength] = useState(0)
@@ -17,19 +18,18 @@ export const TextareaAndFile = () => {
 
   useEffect(() => {
     if (!file?.length || !file) return
-    const currentFile = file[0]
 
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      const content = event.target?.result as string
-      setLength(content.length)
+    const rideFile = async (file: FileList) => {
+      const length = await OrderCalcService.readFile(file[0])
+      setLength(length)
     }
-    reader.readAsText(currentFile)
+
+    rideFile(file)
   }, [file])
 
   useEffect(() => {
     if (!text) return setLength(0)
-    setLength(text.trim().length)
+    setLength(text.length)
   }, [text])
 
   return (
@@ -41,7 +41,12 @@ export const TextareaAndFile = () => {
           <label>
             {' '}
             <DownloadText>завантажте файл</DownloadText>
-            <input type="file" {...register('file')} className="visually-hidden" />
+            <input
+              type="file"
+              {...register('file')}
+              className="visually-hidden"
+              accept=".doc,.docx,.pdf,.pptx,.xls,.xlsx,.txt,.rtf"
+            />
           </label>
         </FileWrapper>
       )}
