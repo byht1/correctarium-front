@@ -6,6 +6,7 @@ import { TOrder } from 'src/service/orderCalc/type'
 
 export const BoardCost = () => {
   const [order, setOrder] = useState<TOrder | null>(null)
+  console.log('🚀  order:', order)
   const { watch } = useFormContext()
   const paramsOrder = watch(['file', 'text', 'language', 'service'])
 
@@ -21,7 +22,7 @@ export const BoardCost = () => {
 
       if (!length) return
 
-      const orderCalcService = new OrderCalcService({ file, text, language, service, length })
+      const orderCalcService = new OrderCalcService({ file, text, language, service, length: 7000 })
       const orderData = orderCalcService.getOrderData()
       if (orderData.price !== order?.price) {
         setOrder(orderData)

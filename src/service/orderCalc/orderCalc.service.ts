@@ -106,22 +106,30 @@ export class OrderCalcService extends OrderCalculationData implements IOrderCalc
       millisecond: 0,
     })
 
-    // Чи розміщено замовлення у вихідний день?
+    // Check if the order is placed on a weekend
     if (moment().isoWeekday() === 6) {
+      // If it's Saturday, start counting from Monday
       startOfWorkday.add(2, 'days')
       endOfWorkday.add(2, 'days')
     } else if (moment().isoWeekday() === 7) {
+      // If it's Sunday, start counting from Monday
       startOfWorkday.add(1, 'day')
       endOfWorkday.add(1, 'day')
     }
 
-    // Розрахунок робочого часу, що залишився, з урахуванням вихідних
+    // Calculate the remaining work time after considering weekends
     const remainingWorkTimeMs = workTimeMs % (WORKING_HOURS * HOUR_MS)
     const additionalDays = Math.floor(workTimeMs / (WORKING_HOURS * HOUR_MS))
 
-    // Додаю додаткові робочі дні на основі часу, що залишився
+    // Add additional work days based on remaining work time
     let currentWorkTimeMs = remainingWorkTimeMs
     const currentDeadline = moment(startOfWorkday)
+
+    // Adjust the start of the countdown if the order is placed during working hours
+    if (moment().isSameOrAfter(startOfWorkday) && moment().isBefore(endOfWorkday)) {
+      currentWorkTimeMs += moment().diff(startOfWorkday)
+    }
+
     while (currentWorkTimeMs > 0) {
       const isAfterWorkday = currentDeadline.isAfter(endOfWorkday)
       const isSaturday = currentDeadline.isoWeekday() === 6
@@ -139,14 +147,14 @@ export class OrderCalcService extends OrderCalculationData implements IOrderCalc
       currentWorkTimeMs -= allocatedWorkTimeMs
     }
 
-    // Додаю додаткові робочі дні залежно від кількості додаткових днів
+    // Add additional work days based on the number of additional days
     currentDeadline.add(additionalDays, 'days')
 
-    // Коригую термін, якщо він припадає на вихідні
+    // Adjust the deadline if it falls on a weekend
     if (currentDeadline.isoWeekday() === 6) {
-      currentDeadline.add(2, 'days')
+      currentDeadline.add(2, 'days') // Move to Monday
     } else if (currentDeadline.isoWeekday() === 7) {
-      currentDeadline.add(1, 'day')
+      currentDeadline.add(1, 'day') // Move to Monday
     }
 
     // return currentDeadline.format('dddd HH:mm')

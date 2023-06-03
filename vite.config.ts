@@ -1,24 +1,24 @@
-import react from "@vitejs/plugin-react"
-import checker from "vite-plugin-checker"
-import { defineConfig } from "vite"
-import path from "path"
-import { readdirSync } from "fs"
+import react from '@vitejs/plugin-react'
+import checker from 'vite-plugin-checker'
+import { defineConfig } from 'vitest/config'
+import path from 'path'
+import { readdirSync } from 'fs'
 
 const absolutePathAliases: { [key: string]: string } = {}
-const srcPath = path.resolve("./")
-const srcRootContent = readdirSync(srcPath, { withFileTypes: true }).map(
-  dirent => dirent.name.replace(/(\.ts){1}(x?)/, "")
+const srcPath = path.resolve('./')
+const srcRootContent = readdirSync(srcPath, { withFileTypes: true }).map((dirent) =>
+  dirent.name.replace(/(\.ts){1}(x?)/, '')
 )
 
-srcRootContent.forEach(directory => {
+srcRootContent.forEach((directory) => {
   absolutePathAliases[directory] = path.join(srcPath, directory)
 })
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: "./",
-  publicDir: "public",
-  base: "/",
+  root: './',
+  publicDir: 'public',
+  base: '/',
   resolve: {
     alias: {
       ...absolutePathAliases,
@@ -26,7 +26,7 @@ export default defineConfig({
   },
 
   build: {
-    outDir: "dist",
+    outDir: 'dist',
   },
   server: {
     open: true,
@@ -41,4 +41,9 @@ export default defineConfig({
       },
     }),
   ],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+  },
 })
