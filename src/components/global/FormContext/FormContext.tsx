@@ -26,9 +26,7 @@ export const FormContext: FC<PropsFormContext> = ({
       <form
         onKeyDown={(e) => checkKeyDown(e)}
         autoComplete={autoComplete}
-        onSubmit={handleSubmit(submit, (error) => {
-          console.log('🚀  error:', error)
-        })}
+        onSubmit={handleSubmit(submit)}
         noValidate
       >
         {children}
