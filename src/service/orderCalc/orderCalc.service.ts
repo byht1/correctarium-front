@@ -164,7 +164,6 @@ export class OrderCalcService extends OrderCalculationData implements IOrderCalc
 
   private getExpansion: TGetExpansionFn = (file) => {
     const [expansion = '.doc'] = file?.name?.split('.').reverse() || []
-    console.log('🚀  OrderCalcService  expansion:', expansion)
     return expansion
   }
 
