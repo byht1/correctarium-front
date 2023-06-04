@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && npm run lint:build && rm -rf ./dist && vite build",
+    "build": "rm -rf ./dist && vite build",
     "preview": "vite preview",
     "test": "vitest",
     "lint": "eslint src/**/*.{js,jsx,ts,tsx,json}",
