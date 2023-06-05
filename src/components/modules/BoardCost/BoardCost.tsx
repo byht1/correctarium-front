@@ -21,7 +21,7 @@ export const BoardCost = () => {
 
       if (!length) return
 
-      const orderCalcService = new OrderCalcService({ file, text, language, service, length: 7000 })
+      const orderCalcService = new OrderCalcService({ file, text, language, service, length })
       const orderData = orderCalcService.getOrderData()
       if (orderData.price !== order?.price) {
         setOrder(orderData)

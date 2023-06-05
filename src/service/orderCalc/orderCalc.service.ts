@@ -117,6 +117,12 @@ export class OrderCalcService extends OrderCalculationData implements IOrderCalc
       endOfWorkday.add(1, 'day')
     }
 
+    // Check if the order is placed after the end of the workday
+    if (moment().isAfter(endOfWorkday)) {
+      startOfWorkday.add(1, 'day')
+      endOfWorkday.add(1, 'day')
+    }
+
     // Calculate the remaining work time after considering weekends
     const remainingWorkTimeMs = workTimeMs % (WORKING_HOURS * HOUR_MS)
     const additionalDays = Math.floor(workTimeMs / (WORKING_HOURS * HOUR_MS))

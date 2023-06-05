@@ -1,13 +1,13 @@
 import * as sinon from 'sinon'
 import { OrderCalcService } from './orderCalc.service'
 
+const timeStart = (date = '2023-05-15T15:00:00') => {
+  const desiredTime = new Date(date)
+  return sinon.useFakeTimers(desiredTime.getTime())
+}
+
 describe('SERVICE Calc order', () => {
   let clock: sinon.SinonFakeTimers
-
-  beforeEach(() => {
-    const desiredTime = new Date('2023-05-15T15:00:00') // Понеділок
-    clock = sinon.useFakeTimers(desiredTime.getTime())
-  })
 
   afterEach(() => {
     // Відновлюємо глобальні таймери після кожного тесту
@@ -15,6 +15,7 @@ describe('SERVICE Calc order', () => {
   })
 
   it('EN Order in the middle of the day', () => {
+    clock = timeStart()
     const orderCalcService = new OrderCalcService({
       length: 200,
       language: 'Англійська',
@@ -29,6 +30,7 @@ describe('SERVICE Calc order', () => {
   })
 
   it('UK Order in the middle of the day', () => {
+    clock = timeStart()
     const orderCalcService = new OrderCalcService({
       length: 2000,
       language: 'Українська',
@@ -42,7 +44,8 @@ describe('SERVICE Calc order', () => {
     expect(time).toBe('2 годин 30 хвилин')
   })
 
-  it('EN End order for', () => {
+  it('EN Next day order', () => {
+    clock = timeStart()
     const orderCalcService = new OrderCalcService({
       length: 3333,
       language: 'Англійська',
@@ -56,7 +59,8 @@ describe('SERVICE Calc order', () => {
     expect(time).toBe('11 годин 0 хвилин')
   })
 
-  it('UK End order for', () => {
+  it('UK Next day order', () => {
+    clock = timeStart()
     const orderCalcService = new OrderCalcService({
       length: 11111,
       language: 'Українська',
@@ -71,6 +75,7 @@ describe('SERVICE Calc order', () => {
   })
 
   it('EN Order at the end of the week', () => {
+    clock = timeStart()
     const orderCalcService = new OrderCalcService({
       length: 33214,
       language: 'Англійська',
@@ -85,6 +90,7 @@ describe('SERVICE Calc order', () => {
   })
 
   it('UK Order at the end of the week', () => {
+    clock = timeStart()
     const orderCalcService = new OrderCalcService({
       length: 111110,
       language: 'Українська',
@@ -96,5 +102,65 @@ describe('SERVICE Calc order', () => {
     expect(price).toBe(5556)
     expect(deadlineDate).toBe('24 травня, 18:21')
     expect(time).toBe('84 годин 21 хвилин')
+  })
+
+  it('EN The order was placed after the end of the working day', () => {
+    clock = timeStart('2023-05-15T20:00:00')
+    const orderCalcService = new OrderCalcService({
+      length: 200,
+      language: 'Англійська',
+      service: 'Переклад',
+    })
+
+    const { deadline, price, deadlineDate, time } = orderCalcService.getOrderData()
+    expect(deadline).toBe(5762163)
+    expect(price).toBe(120)
+    expect(deadlineDate).toBe('16 травня, 11:36')
+    expect(time).toBe('1 годин 36 хвилин')
+  })
+
+  it('UK The order was placed after the end of the working day', () => {
+    clock = timeStart('2023-05-15T20:00:00')
+    const orderCalcService = new OrderCalcService({
+      length: 200,
+      language: 'Українська',
+      service: 'Переклад',
+    })
+
+    const { deadline, price, deadlineDate, time } = orderCalcService.getOrderData()
+    expect(deadline).toBe(4140136)
+    expect(price).toBe(50)
+    expect(deadlineDate).toBe('16 травня, 11:09')
+    expect(time).toBe('1 годин 9 хвилин')
+  })
+
+  it('EN The order was made on a weekend', () => {
+    clock = timeStart('2023-05-20T20:00:00')
+    const orderCalcService = new OrderCalcService({
+      length: 200,
+      language: 'Англійська',
+      service: 'Переклад',
+    })
+
+    const { deadline, price, deadlineDate, time } = orderCalcService.getOrderData()
+    expect(deadline).toBe(5762163)
+    expect(price).toBe(120)
+    expect(deadlineDate).toBe('22 травня, 11:36')
+    expect(time).toBe('1 годин 36 хвилин')
+  })
+
+  it('UK The order was made on a weekend', () => {
+    clock = timeStart('2023-05-20T20:00:00')
+    const orderCalcService = new OrderCalcService({
+      length: 200,
+      language: 'Українська',
+      service: 'Переклад',
+    })
+
+    const { deadline, price, deadlineDate, time } = orderCalcService.getOrderData()
+    expect(deadline).toBe(4140136)
+    expect(price).toBe(50)
+    expect(deadlineDate).toBe('22 травня, 11:09')
+    expect(time).toBe('1 годин 9 хвилин')
   })
 })

@@ -34,7 +34,14 @@ export const TextareaAndFile = () => {
 
   return (
     <UserContentsWrapper>
-      {!file?.length && <Textarea {...register('text')}></Textarea>}
+      {!file?.length && (
+        <>
+          <label className="visually-hidden" htmlFor="text">
+            text
+          </label>
+          <Textarea {...register('text')} id="text"></Textarea>
+        </>
+      )}
       {!text && (
         <FileWrapper className={length ? 'visually-hidden' : ''}>
           <span>Введіть текст або</span>
